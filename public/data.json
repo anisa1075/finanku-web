@@ -1,0 +1,26 @@
+[
+  {
+    "id": 1,
+    "img": "../src/assets/article1.jpg",
+    "title": "Mengatur Anggaran Bulanan",
+    "content": "Pelajari cara mengalokasikan pemasukan untuk kebutuhan pokok, tabungan, dan hiburan agar keuangan lebih sehat."
+  },
+  {
+    "id": 2,
+    "img": "../src/assets/article2.jpg",
+    "title": "Tips Menabung untuk Dana Darurat",
+    "content": "Dana darurat membantu menghadapi situasi tak terduga. Targetkan minimal 3-6 kali pengeluaran bulanan."
+  },
+  {
+    "id": 3,
+    "img": "../src/assets/article1.jpg",
+    "title": "Investasi Aman untuk Pemula",
+    "content": "Mulailah berinvestasi di instrumen rendah risiko seperti deposito atau reksa dana pasar uang."
+  },
+  {
+    "id": 3,
+    "img": "../src/assets/article1.jpg",
+    "title": "Investasi Aman untuk Pemula",
+    "content": "Mulailah berinvestasi di instrumen rendah risiko seperti deposito atau reksa dana pasar uang."
+  }
+]
