@@ -4,10 +4,10 @@ import { CaretDoubleRight } from '@phosphor-icons/react';
 export default function CardArticle() {
     return (
         <>
-            <div className=' relative z-20 grid grid-cols-3 gap-12 my-4'>
+            <div className=' relative z-20 lg:grid lg:grid-cols-3 lg:gap-12 md:gap-8 my-4'>
                 {data.slice(0, 3).map((item) => (
-                    <div key={item.id} className='bg-[#f9f9f9] shadow-[0_15px_50px_rgba(0,0,0,0.1)] rounded-xl px-6 py-7 flex flex-col gap-6 h-full'>
-                        <div className='w-[300px] h-[200px]'>
+                    <div key={item.id} className='bg-[#f9f9f9] shadow-[0_15px_50px_rgba(0,0,0,0.1)] rounded-xl px-6 py-7 flex flex-col gap-6 h-full lg:my-0 my-8'>
+                        <div className='lg:w-[300px] md:w-[180px] md:h-[150px] lg:h-[200px]'>
                             <img className='w-full h-full object-cover rounded-sm ' src={item.img} alt="" />
                         </div>
 

@@ -5,3 +5,29 @@
   --font-outfit: 'Outfit', 'sans-serif';
   --font-poppins: 'Poppins', 'sans-serif';
 }
+
+.btn {
+  position: relative;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #9B51E0;
+  background: none;
+  border: 2px solid #9B51E0;
+  border-radius: 9999px;
+  cursor: pointer;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.liquid {
+  background: linear-gradient(#9B51E0 0 0) no-repeat calc(200% - var(--p, 0%))
+    100% / 200% var(--p, 0.2em);
+  transition: 0.3s var(--t, 0s),
+    background-position 0.3s calc(0.3s - var(--t, 0s));
+}
+
+.liquid:hover {
+  --p: 100%;
+  --t: 0.3s;
+  color: #fff;
+}

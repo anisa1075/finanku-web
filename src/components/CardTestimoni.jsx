@@ -17,7 +17,7 @@ export default function CardTestimoni() {
                 className="bg-transparent"
                 modules={[Autoplay]}
                 spaceBetween={10}
-                slidesPerView={3}
+                slidesPerView={1}
                 autoplay={{
                     delay: 2000, // waktu jeda 2 detik
                     disableOnInteraction: false, // tetap jalan walau di-swipe manual
@@ -25,10 +25,18 @@ export default function CardTestimoni() {
                 }}
 
                 loop={true}
+                breakpoints={{
+                    640: { // >= 640px (sm)
+                        slidesPerView: 2,
+                    },
+                    1024: { // >= 1024px (lg)
+                        slidesPerView: 3,
+                    },
+                }}
 
             >
                 {cards.map((card, index) => (
-                    <SwiperSlide key={index} className='bg-white'>
+                    <SwiperSlide key={index} className='bg-white mx-2'>
                         <div
                             className="bg-[#f5f7fb] rounded-[8px] py-6 px-10 font-poppins flex flex-col gap-2"
                         >
