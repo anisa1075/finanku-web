@@ -7,7 +7,6 @@ export default function Budget() {
     const [showModal, setShowModal] = useState(false);
     const [showModalPengeluaran, setShowModalPengeluaran] = useState(false);
     const [showDetails, setShowDetails] = useState(false);
-
     const [namaBudget, setNamaBudget] = useState("");
     const [totalBudget, setTotalBudget] = useState("");
 
@@ -23,48 +22,217 @@ export default function Budget() {
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        const newBudget = {
-            id: Date.now(), // unik id
-            nama: namaBudget,
-            total: parseInt(totalBudget),
-        };
+        if (isEdit && selectedBudget) {
+            // untuk update
+            const updatedBudgets = budgets.map((b) =>
+                b.id === selectedBudget.id
+                    ? { ...b, nama: namaBudget, total: parseInt(totalBudget) }
+                    : b
+            );
 
-        const updatedBudgets = [...budgets, newBudget];
-        setBudgets(updatedBudgets);
+            setBudgets(updatedBudgets);
+            localStorage.setItem("budgets", JSON.stringify(updatedBudgets));
 
-        // simpan ke localStorage
-        localStorage.setItem("budgets", JSON.stringify(updatedBudgets));
+            // update selectedBudget biar langsung rerender
+            const updatedSelected = updatedBudgets.find(b => b.id === selectedBudget.id);
+            setSelectedBudget(updatedSelected);
+        } else {
+            //UNTUK TAMBAH
+            const newBudget = {
+                id: Date.now(), // unik id
+                nama: namaBudget,
+                total: parseInt(totalBudget),
+                spent: []  // default untuk array kosong
+            };
+
+            const updatedBudgets = [...budgets, newBudget];
+            setBudgets(updatedBudgets);
+            localStorage.setItem("budgets", JSON.stringify(updatedBudgets));
+        }
 
         // reset input
         setNamaBudget("");
         setTotalBudget("");
+        setShowModal(false);
+    };
 
-        // tutup modal
+
+    // untuk details
+    const [selectedBudget, setSelectedBudget] = useState(null);
+    const handleClick = (budgetId) => {
+        // cari data budget berdasarkan id
+        const budget = budgets.find((b) => b.id === budgetId);
+        if (!budget) {
+            console.error("Budget dengan id", budgetId, "tidak ditemukan");
+            return;
+        }
+        setSelectedBudget(budget);
+        setShowDetails(true);
+        console.log(budget.id);
+    };
+
+    // ketika klik update icon
+    const [isEdit, setIsEdit] = useState(false);
+
+    const handleUpdateClick = () => {
+        if (selectedBudget) {
+            setNamaBudget(selectedBudget.nama);
+            setTotalBudget(selectedBudget.total);
+            setShowModal(true);
+            // setShowDetails(true);
+            setIsEdit(true);
+        }
+    };
+
+    // untuk handle delete
+    const handleDelete = (id) => {
+        const confirmDelete = window.confirm(`Yakin ingin menghapus budget ${selectedBudget?.nama}?`);
+        if (!confirmDelete) return; // kalau batal, tidak lanjut
+
+        const updatedBudgets = budgets.filter((b) => b.id !== id);
+
+        setBudgets(updatedBudgets);
+        localStorage.setItem("budgets", JSON.stringify(updatedBudgets));
+
         setShowModal(false);
         setShowDetails(false);
     };
+
+    // PENGELUARAN
+    const [selectedSpent, setSelectedSpent] = useState(null);
+    const [namaPengeluaran, setNamaPengeluaran] = useState("");
+    const [jumlahPengeluaran, setJumlahPengeluaran] = useState("");
+    const [tanggalPengeluaran, setTanggalPengeluaran] = useState("");
+    const [editingSpentId, setEditingSpentId] = useState(null);
+
+    // untuk add pengeluaran
+    const handleAddOrUpdateSpent = (budgetId, spentData) => {
+        // spentData = { id, name, amount, date }
+
+        const updatedBudgets = budgets.map((b) => {
+            if (b.id === budgetId) {
+                // cek apakah spent sudah ada (update) atau belum (add)
+                const existingSpent = b.spent.find((s) => s.id === spentData.id);
+
+                if (existingSpent) {
+                    // 🔹 UPDATE spent
+                    return {
+                        ...b,
+                        spent: b.spent.map((s) =>
+                            s.id === spentData.id
+                                ? { ...s, ...spentData } // replace data lama dengan baru
+                                : s
+                        ),
+                    };
+                } else {
+                    // 🔹 ADD spent
+                    return {
+                        ...b,
+                        spent: [...(b.spent || []), spentData],
+                    };
+                }
+            }
+            return b;
+        });
+
+        // simpan state + localStorage
+        setBudgets(updatedBudgets);
+        localStorage.setItem("budgets", JSON.stringify(updatedBudgets));
+
+        // sync ke selectedBudget kalau yang sedang dibuka adalah budget ini
+        if (selectedBudget && selectedBudget.id === budgetId) {
+            const existingSpent = selectedBudget.spent.find((s) => s.id === spentData.id);
+
+            if (existingSpent) {
+                setSelectedBudget({
+                    ...selectedBudget,
+                    spent: selectedBudget.spent.map((s) =>
+                        s.id === spentData.id ? { ...s, ...spentData } : s
+                    ),
+                });
+            } else {
+                setSelectedBudget({
+                    ...selectedBudget,
+                    spent: [...selectedBudget.spent, spentData],
+                });
+            }
+        }
+    };
+
+
+    const handleSpentClick = (spent) => {
+        setSelectedSpent(spent);              // simpan data spent yg diklik
+        setNamaPengeluaran(spent.name);       // isi field modal
+        setJumlahPengeluaran(spent.amount);
+        setTanggalPengeluaran(spent.date);
+        setEditingSpentId(spent.id); // simpan id lama
+
+        setShowModalPengeluaran(true);
+        setIsEdit(true);
+    };
+
+    // untuk delete
+    const handleDeleteSpent = (budgetId, spentId) => {
+
+        const updatedBudgets = budgets.map((b) => {
+            if (b.id === budgetId) {
+                return {
+                    ...b,
+                    spent: (b.spent || []).filter((s) => String(s.id) !== String(spentId)),
+
+                };
+            }
+            return b;
+        });
+
+        setBudgets(updatedBudgets);
+        localStorage.setItem("budgets", JSON.stringify(updatedBudgets));
+
+        // sync ke selectedBudget
+        const updatedSelectedBudget = updatedBudgets.find(b => b.id === budgetId);
+        setSelectedBudget(updatedSelectedBudget);
+        setShowModalPengeluaran(false);
+        console.log("Delete called with:", budgetId, spentId);
+
+    };
+
+    // untuk sisabudget
+    const getRemainingBudget = (budget) => {
+        const totalSpent = (budget.spent || []).reduce(
+            (sum, s) => sum + s.amount,
+            0
+        );
+        return budget.total - totalSpent;
+    };
+
 
     return (
         <div style={{ backgroundImage: `url(${Budgetbg})` }} className='bg-cover relative'>
             <div className='flex flex-col items-center'>
                 <h1 className='text-4xl font-bold font-outfit mt-24 text-[#9B51E0] text-center ' style={{ textShadow: "2px 2px 6px rgba(0,0,0,0.2)" }}>My Budget.</h1>
             </div>
-            <div className='h-screen' style={{ display: showDetails ? "none" : "block" }}>
+            <div className='h-screen mt-10 md:mx-10' style={{ display: showDetails ? "none" : "block" }}>
                 {/* Main Home */}
                 {!showDetails &&
 
-                    <main id="budgets" className="container budgets mt-10" onClick={() => setShowDetails(true)}>
-                        {budgets.map((budget) => (
-                            <div key={budget.id} className="budget__card" data-budgetid={budget.id} onClick={() => setShowDetails(true)}>
-                                <h2 className="budget__name">{budget.nama}</h2>
-                                <p className="budget__amount">Rp. {budget.total}</p>
-                                <p className="budget__total">Total Rp. {budget.total}</p>
-                            </div>
-                        ))}
+                    <main id="budgets" className="container budgets mt-10">
+                        {budgets.map((budget) => {
+                            const remaining = getRemainingBudget(budget);
+                            return (
+                                <div key={budget.id} className="budget__card" data-budgetid={budget.id} onClick={() => handleClick(budget.id)}>
+                                    <h2 className="budget__name">{budget.nama}</h2>
+                                    <p className="budget__amount">Rp. {remaining.toLocaleString("id-ID")}</p>
+                                    <p className="budget__total">Total Rp. {budget.total.toLocaleString("id-ID")} </p>
+                                </div>
+                            )
+                        })}
 
                         <button className="add__budget__btn" onClick={() => {
                             setShowModal(true);
                             setShowDetails(false);
+                            setNamaBudget("");
+                            setTotalBudget("");
+                            setIsEdit(false);
                         }}>+</button>
                     </main>
                 }
@@ -73,26 +241,33 @@ export default function Budget() {
 
             {/* Main Details */}
             {showDetails &&
-                <div className='w-full mx-auto flex justify-center py-18'>
-                    <main id="budget_details" className="container">
+                <div className='w-full flex justify-center py-18'>
+                    <main id="budget_details" className="container md:px-10 lg:px-0 px-6">
                         <button className="back__home" onClick={() => setShowDetails(false)}>
                             <i className="ph ph-caret-left icon__back"></i>
                             Halaman Utama
                         </button>
                         <div className="budget__card">
                             <div>
-                                <h2 className="budget__name">Makan dan Minum</h2>
-                                <p className="budget__amount">Rp 968.000</p>
-                                <p className="budget__total">Total Rp 1.000.000</p>
+                                <h2 className="budget__name">{selectedBudget.nama}</h2>
+                                <p className="budget__amount">Rp {getRemainingBudget(selectedBudget).toLocaleString("id-ID")}</p>
+                                <p className="budget__total">Total Rp {selectedBudget.total.toLocaleString("id-ID")}</p>
                             </div>
 
-                            <div className="icon">
+                            <div className="icon" onClick={handleUpdateClick}>
                                 <i className="ph ph-pencil-line"></i>
                             </div>
 
                         </div>
 
-                        <button className="add__spent__btn" onClick={() => setShowModalPengeluaran(true)}><span>+</span> Catat Pengeluaran</button>
+                        <button className="add__spent__btn" onClick={() => {
+                            setShowModalPengeluaran(true),
+                                setIsEdit(false),
+                                setNamaPengeluaran("");       // isi field modal
+                            setJumlahPengeluaran("");
+                            setTanggalPengeluaran("");
+                        }}>
+                            <span>+</span> Catat Pengeluaran</button>
 
                         <div className="sort__spent">
                             <i className="ph ph-arrows-down-up"></i>
@@ -105,16 +280,18 @@ export default function Budget() {
                         </div>
 
                         <div className="spent">
-                            <div className="spent__item">
-                                <div className="spent__item__description">
-                                    <h4>Bakso</h4>
-                                    <p>2025-07-10</p>
-                                </div>
-                                <div className="spent__item__price">
+                            {selectedBudget.spent.map((spent) => (
+                                <div className="spent__item" key={spent.id} onClick={() => handleSpentClick(spent)}>
+                                    <div className="spent__item__description">
+                                        <h4>{spent.name}</h4>
+                                        <p>{spent.date}</p>
+                                    </div>
+                                    <div className="spent__item__price">
 
-                                    <p>Rp. 50000</p>
+                                        <p>Rp. {spent.amount.toLocaleString("id-ID")}</p>
+                                    </div>
                                 </div>
-                            </div>
+                            ))}
                         </div>
                     </main>
                 </div>
@@ -125,12 +302,11 @@ export default function Budget() {
                 <div id="budget_form" className="modal">
                     <div className="card">
                         <div className="modal__card__heading">
-                            <h4>Tambah Budget</h4>
+                            <h4>{isEdit ? "Update Budget" : "Tambah Budget"}</h4>
                             <i
                                 className="ph-fill ph-x-circle"
                                 onClick={() => {
                                     setShowModal(false);
-                                    setShowDetails(false);
                                 }}
                             ></i>
                         </div>
@@ -160,10 +336,15 @@ export default function Budget() {
                                 />
                             </div>
 
-                            <div className="action">
-                                <button id="delete_budget" type="button" className="danger">
-                                    <i className="ph-fill ph-trash"></i>
-                                </button>
+                            <div className="action" style={{
+                                display: "flex",
+                                justifyContent: isEdit ? "space-between" : "flex-end",
+                            }}>
+                                {isEdit &&
+                                    <button id="delete_budget" type="button" className="danger" onClick={() => handleDelete(selectedBudget.id)}>
+                                        <i className="ph-fill ph-trash"></i>
+                                    </button>
+                                }
                                 <button type="submit">Simpan</button>
                             </div>
                         </form>
@@ -182,20 +363,36 @@ export default function Budget() {
                                 setShowDetails(true)
                             }}></i>
                         </div>
-                        <form action="">
+                        <form action="" onSubmit={(e) => {
+                            e.preventDefault();
+                            const newSpent = {
+                                id: editingSpentId ? editingSpentId : Date.now(), // kalau edit pakai id lama
+                                name: namaPengeluaran,
+                                amount: parseInt(jumlahPengeluaran),
+                                date: tanggalPengeluaran,
+                            };
+                            handleAddOrUpdateSpent(selectedBudget.id, newSpent);
+                            setEditingSpentId(null); // reset setelah selesai
+                            setShowModalPengeluaran(false);
+                        }}>
                             <input type="hidden" id="id_pengeluaran" />
                             <label for="nama_pengeluaran">Nama Pengeluaran</label>
-                            <input id="nama_pengeluaran" name="nama_pengeluaran" type="text" required />
+                            <input id="nama_pengeluaran" name="nama_pengeluaran" type="text" value={namaPengeluaran} required onChange={(e) => setNamaPengeluaran(e.target.value)} />
                             <label for="jumlah_pengeluaran">Jumlah Pengeluaran</label>
                             <div className="input__money">
                                 <span>Rp</span>
-                                <input id="jumlah_pengeluaran" name="jumlah_pengeluaran" type="number" required />
+                                <input id="jumlah_pengeluaran" name="jumlah_pengeluaran" type="number" value={jumlahPengeluaran} required onChange={(e) => setJumlahPengeluaran(e.target.value)} />
                             </div>
                             <label for="tanggal">Tanggal</label>
-                            <input id="tanggal" name="tanggal" type="date" required />
-                            <div className="action">
-                                <button id="delete_pengeluaran" type="button" className="danger"><i
-                                    className="ph-fill ph-trash"></i></button>
+                            <input id="tanggal" name="tanggal" type="date" value={tanggalPengeluaran} required onChange={(e) => setTanggalPengeluaran(e.target.value)} />
+                            <div className="action" style={{
+                                display: "flex",
+                                justifyContent: isEdit ? "space-between" : "flex-end",
+                            }}>
+                                {isEdit &&
+                                    <button id="delete_pengeluaran" type="button" className="danger" onClick={() => handleDeleteSpent(selectedBudget.id, selectedSpent.id)}><i
+                                        className="ph-fill ph-trash"></i></button>
+                                }
                                 <button type="submit">Simpan</button>
                             </div>
                         </form>
