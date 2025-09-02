@@ -27,6 +27,7 @@ Tailwind CSS
 
 ⚙️ Cara Menjalankan
 1. Download File ZIP
+2. Ekstrak File
 2. Open File
 3. Install dependencies:
 npm install
