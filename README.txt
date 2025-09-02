@@ -1,5 +1,8 @@
 FinankuApp
 
+Deploy Website :
+https://finanku-web.vercel.app/
+
 Aplikasi web untuk membantu pengguna mengatur keuangan pribadi, dibangun dengan React + Vite dan Tailwind CSS.
 
 🚀 Fitur Utama
