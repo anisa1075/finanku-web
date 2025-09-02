@@ -1,28 +1,28 @@
 [
   {
     "id": 1,
-    "img": "../src/assets/article1.jpg",
+    "img": "/assets/article1.jpg",
     "title": "Mengatur Anggaran Bulanan",
     "content": "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like).",
     "date": "26 Agustus 2025"
   },
   {
     "id": 2,
-    "img": "../src/assets/article2.jpg",
+    "img": "/assets/article2.jpg",
     "title": "Tips Menabung untuk Dana Darurat",
     "content": "Dana darurat membantu menghadapi situasi tak terduga. Targetkan minimal 3-6 kali pengeluaran bulanan.",
     "date": "26 Agustus 2025"
   },
   {
     "id": 3,
-    "img": "../src/assets/article1.jpg",
+    "img": "/assets/article1.jpg",
     "title": "Investasi Aman untuk Pemula",
     "content": "Mulailah berinvestasi di instrumen rendah risiko seperti deposito atau reksa dana pasar uang.",
     "date": "26 Agustus 2025"
   },
   {
-    "id": 42,
-    "img": "../src/assets/article1.jpg",
+    "id": 4,
+    "img": "/assets/article1.jpg",
     "title": "Investasi Aman untuk Pemula",
     "content": "Mulailah berinvestasi di instrumen rendah risiko seperti deposito atau reksa dana pasar uang.",
     "date": "26 Agustus 2025"
